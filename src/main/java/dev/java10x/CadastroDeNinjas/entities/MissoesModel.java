@@ -1,6 +1,5 @@
-package dev.java10x.CadastroDeNinjas.Missoes;
+package dev.java10x.CadastroDeNinjas.entities;
 
-import dev.java10x.CadastroDeNinjas.Ninjas.NinjaModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +21,7 @@ public class MissoesModel {
     private Long id;
 
 
-    private String email;
+    private String nome;
 
 
     private String dificuldade;

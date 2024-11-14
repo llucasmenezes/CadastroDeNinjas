@@ -30,6 +30,7 @@ public class NinjaModel {
 
     //@ManyToOne um ninja tem uma unica missao
     @ManyToOne
+    @JoinColumn(name = "missoes_id")
     private MissoesModel missoes;
 
 }

@@ -1,15 +1,20 @@
 package dev.java10x.CadastroDeNinjas.service;
 
+import dev.java10x.CadastroDeNinjas.DTO.NinjaDTO;
+import dev.java10x.CadastroDeNinjas.MAPPER.NinjaMapper;
 import dev.java10x.CadastroDeNinjas.entities.MissoesModel;
 import dev.java10x.CadastroDeNinjas.entities.NinjaModel;
 import dev.java10x.CadastroDeNinjas.repository.MissoesRepository;
 import dev.java10x.CadastroDeNinjas.repository.NinjaRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Service
 public class NinjaService {
 
@@ -17,24 +22,46 @@ public class NinjaService {
     NinjaRepository repository;
 
     @Autowired
-    private MissoesRepository missoesRepository;
+    private final NinjaMapper ninjaMapper;
 
-    public NinjaModel createNinja(NinjaModel ninjaModel) {
-        // Salvar a missão se ela ainda não estiver salva
-        if (ninjaModel.getMissoes() != null && ninjaModel.getMissoes().getId() == null) {
-            MissoesModel savedMissao = missoesRepository.save(ninjaModel.getMissoes());
-            ninjaModel.setMissoes(savedMissao); // Atualiza a missão com a entidade salva
+
+
+    public List<NinjaDTO> findAll() {
+       List<NinjaModel> ninjaModel = repository.findAll();
+        return ninjaModel.stream()
+                         .map(ninjaMapper::map)
+                         .collect(Collectors.toList());
+    }
+
+
+    public NinjaDTO createNinja(NinjaDTO ninjaDTO) {
+        NinjaModel ninjaModel = ninjaMapper.map(ninjaDTO);
+        if(!repository.existsById(ninjaDTO.getId())) {
+            throw new RuntimeException("Ninja ja existente");
         }
-        return repository.save(ninjaModel); // Salva o ninja no banco de dados
+
+        ninjaModel = repository.save(ninjaModel);
+        return ninjaMapper.map(ninjaModel);
     }
 
-    public NinjaModel findById(Long id){
+
+    public Optional<NinjaDTO> findById(Long id){
         Optional<NinjaModel> ninjaPorId = repository.findById(id);
-        return ninjaPorId.orElse(null);
+        if(!ninjaPorId.isPresent()){
+            throw new RuntimeException("Ninja nao encontrado");
+        }
+        return ninjaPorId.map(ninjaMapper::map);
     }
 
-    public List<NinjaModel> findAll() {
-        return repository.findAll();
+    public NinjaDTO NinjaUpdate(Long id, NinjaDTO ninjaDTO){
+        Optional<NinjaModel> ninjaModel = repository.findById(id);
+        if(!ninjaModel.isPresent()){
+            throw new RuntimeException("Ninja nao encontrado");
+        }
+        NinjaModel ninjaUpdated = ninjaMapper.map(ninjaDTO);
+        ninjaUpdated.setId(id);
+        NinjaModel ninjaSave = repository.save(ninjaUpdated);
+        return ninjaMapper.map(ninjaSave);
     }
 
     public boolean deleteNinjaById(Long id) {

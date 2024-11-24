@@ -1,5 +1,6 @@
 package dev.java10x.CadastroDeNinjas.controller;
 
+import dev.java10x.CadastroDeNinjas.DTO.MissoesDTO;
 import dev.java10x.CadastroDeNinjas.entities.MissoesModel;
 import dev.java10x.CadastroDeNinjas.repository.MissoesRepository;
 import dev.java10x.CadastroDeNinjas.service.MissoesService;
@@ -15,38 +16,38 @@ import java.util.Optional;
 public class MissoesController {
 
 MissoesService missoesService;
-MissoesRepository missoesRepository;
+
 
     @GetMapping("/listar")
-    public ResponseEntity<List<MissoesModel>> getAllMission() {
-    List<MissoesModel> missoes  = missoesService.getAll();
+    public ResponseEntity<List<MissoesDTO>> getAllMission() {
+    List<MissoesDTO> missoes  = missoesService.getAll();
     return new ResponseEntity<>(missoes, HttpStatus.OK);
 }
 
     @GetMapping("missao")
-    public ResponseEntity<MissoesModel> getMissionById(@PathVariable Long id){
-        Optional<MissoesModel> missao = Optional.ofNullable(missoesService.findById(id));
-        if(missao.isPresent()){
-            return ResponseEntity.ok(missao.get());
+    public ResponseEntity<MissoesDTO> getMissionById(@PathVariable Long id){
+        Optional<MissoesDTO> missoesDTO = missoesService.findById(id);
+        if(missoesDTO.isPresent()){
+            return ResponseEntity.ok(missoesDTO.get());
         }else{
             return  ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("salvar")
-    public ResponseEntity<MissoesModel> saveMission(@RequestBody MissoesModel missoesModel){
-        MissoesModel savedMissao = missoesService.saveMissao(missoesModel);
+    public ResponseEntity<MissoesDTO> saveMission(@RequestBody MissoesDTO missoesDTO){
+        MissoesDTO savedMissao = missoesService.createMissao(missoesDTO);
         return new ResponseEntity<>(savedMissao, HttpStatus.CREATED);
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteMissao(@PathVariable  Long id){
-
-        if(missoesRepository.existsById(id)){
+    public ResponseEntity<Void> deleteMissao(@PathVariable  Long id) {
+        if (missoesService.findById(id).isPresent()) {
             missoesService.deleteMissaoById(id);
             return ResponseEntity.noContent().build();
-        } else{
-            return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.notFound().build();
+
     }
 }

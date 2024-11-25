@@ -34,21 +34,14 @@ public class NinjaController {
     @GetMapping("/listar/{id}")
     public ResponseEntity<Optional<NinjaDTO>> getNinjaById(@PathVariable  Long id){
         Optional<NinjaDTO> ninja = ninjaService.findById(id);
-        if(!ninja.isPresent()){
-           return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-       return new ResponseEntity<>(ninja, HttpStatus.OK);
+        return new ResponseEntity<>(ninja, HttpStatus.OK);
     }
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNinja(@PathVariable Long id) {
         boolean isDeleted = ninjaService.deleteNinjaById(id);
-        if (isDeleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
  }

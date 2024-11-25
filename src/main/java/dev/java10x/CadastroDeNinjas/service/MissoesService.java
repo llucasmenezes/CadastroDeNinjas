@@ -3,6 +3,8 @@ package dev.java10x.CadastroDeNinjas.service;
 import dev.java10x.CadastroDeNinjas.DTO.MissoesDTO;
 import dev.java10x.CadastroDeNinjas.MAPPER.MissoesMapper;
 import dev.java10x.CadastroDeNinjas.entities.MissoesModel;
+import dev.java10x.CadastroDeNinjas.exceptions.IdExistsException;
+import dev.java10x.CadastroDeNinjas.exceptions.NoExistIdException;
 import dev.java10x.CadastroDeNinjas.repository.MissoesRepository;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +38,7 @@ public class MissoesService {
     public MissoesDTO createMissao(MissoesDTO missoesDTO){
         MissoesModel missoesModel = missoesMapper.map(missoesDTO);
         if(!missoesRepository.existsById(missoesDTO.getId())){
-            throw new RuntimeException("Missao nao econtrada!");
+            throw new IdExistsException("missao ja Existente");
         }
 
         missoesModel = missoesRepository.save(missoesModel);
@@ -48,7 +50,7 @@ public class MissoesService {
     public Optional<MissoesDTO> findById(Long id) {
         Optional<MissoesModel> missoes = missoesRepository.findById(id);
         if(!missoes.isPresent()){
-            throw new RuntimeException("Missao nao encontrada!");
+            throw new NoExistIdException(id);
         }
         return missoes.map(missoesMapper::map);
 
@@ -58,7 +60,7 @@ public class MissoesService {
     public MissoesDTO missoesDTO(Long id, MissoesDTO missoesDTO){
         Optional<MissoesModel> missaoExistente = missoesRepository.findById(id);
         if(!missaoExistente.isPresent()){
-            throw  new RuntimeException("Missao nao encontrada!");
+            throw  new NoExistIdException(id);
         }
 
         MissoesModel missoesModel = missoesMapper.map(missoesDTO);
@@ -69,6 +71,9 @@ public class MissoesService {
 
 
     public void deleteMissaoById(Long id){
+        if(!missoesRepository.existsById(id)){
+            throw new NoExistIdException(id);
+        }
          missoesRepository.deleteById(id);
     }
 }

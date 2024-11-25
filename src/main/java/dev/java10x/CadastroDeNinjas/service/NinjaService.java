@@ -2,9 +2,9 @@ package dev.java10x.CadastroDeNinjas.service;
 
 import dev.java10x.CadastroDeNinjas.DTO.NinjaDTO;
 import dev.java10x.CadastroDeNinjas.MAPPER.NinjaMapper;
-import dev.java10x.CadastroDeNinjas.entities.MissoesModel;
 import dev.java10x.CadastroDeNinjas.entities.NinjaModel;
-import dev.java10x.CadastroDeNinjas.repository.MissoesRepository;
+import dev.java10x.CadastroDeNinjas.exceptions.IdExistsException;
+import dev.java10x.CadastroDeNinjas.exceptions.NoExistIdException;
 import dev.java10x.CadastroDeNinjas.repository.NinjaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class NinjaService {
     public NinjaDTO createNinja(NinjaDTO ninjaDTO) {
         NinjaModel ninjaModel = ninjaMapper.map(ninjaDTO);
         if(!repository.existsById(ninjaDTO.getId())) {
-            throw new RuntimeException("Ninja ja existente");
+            throw new IdExistsException("Ops... Ninja já existente!");
         }
 
         ninjaModel = repository.save(ninjaModel);
@@ -48,7 +48,7 @@ public class NinjaService {
     public Optional<NinjaDTO> findById(Long id){
         Optional<NinjaModel> ninjaPorId = repository.findById(id);
         if(!ninjaPorId.isPresent()){
-            throw new RuntimeException("Ninja nao encontrado");
+            throw new NoExistIdException(id);
         }
         return ninjaPorId.map(ninjaMapper::map);
     }
@@ -56,7 +56,7 @@ public class NinjaService {
     public NinjaDTO NinjaUpdate(Long id, NinjaDTO ninjaDTO){
         Optional<NinjaModel> ninjaModel = repository.findById(id);
         if(!ninjaModel.isPresent()){
-            throw new RuntimeException("Ninja nao encontrado");
+            throw new NoExistIdException(id);
         }
         NinjaModel ninjaUpdated = ninjaMapper.map(ninjaDTO);
         ninjaUpdated.setId(id);
@@ -65,8 +65,11 @@ public class NinjaService {
     }
 
     public boolean deleteNinjaById(Long id) {
-        repository.deleteById(id);
-        return false;
+            if(!repository.existsById(id)){
+              throw new NoExistIdException(id);
+            }
+            repository.deleteById(id);
+                    return false;
    }
 
 }

@@ -28,6 +28,8 @@ public class NinjaModel {
 
     private String age;
 
+    private String rank;
+
     //@ManyToOne um ninja tem uma unica missao
     @ManyToOne
     @JoinColumn(name = "missoes_id")

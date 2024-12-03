@@ -12,12 +12,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IdExistsException.class)
     public ResponseEntity<ErrorResponse> handleIdExistsException(IdExistsException e){
-        ErrorResponse errorResponse = new ErrorResponse("Ninja Existente", e.getMessage());
+       ErrorResponse errorResponse = new ErrorResponse();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NoExistIdException.class)
     public ResponseEntity<ErrorResponse> handleNoIdException(NoExistIdException e){
-        ErrorResponse errorResponse = new ErrorResponse("Ops... Ninja já existe!", e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse();
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
